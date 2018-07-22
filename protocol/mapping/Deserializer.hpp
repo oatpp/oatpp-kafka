@@ -25,7 +25,56 @@
 #ifndef oatpp_kafka_protocol_mapping_Deserializer_hpp
 #define oatpp_kafka_protocol_mapping_Deserializer_hpp
 
+#include "oatpp/core/data/mapping/type/List.hpp"
+#include "oatpp/core/data/mapping/type/Object.hpp"
+#include "oatpp/core/data/mapping/type/Primitive.hpp"
+#include "oatpp/core/data/mapping/type/Type.hpp"
+
+#include "oatpp/core/parser/ParsingCaret.hpp"
+
+#include "oatpp/core/Types.hpp"
+
 namespace oatpp { namespace kafka { namespace protocol { namespace mapping {
+  
+class Deserializer {
+public:
+  typedef oatpp::data::mapping::type::Type Type;
+  typedef oatpp::data::mapping::type::Type::Property Property;
+  
+  typedef oatpp::data::mapping::type::Object Object;
+  
+  typedef oatpp::data::mapping::type::AbstractObjectWrapper AbstractObjectWrapper;
+  
+  typedef oatpp::data::mapping::type::List<AbstractObjectWrapper> AbstractList;
+  
+  template<class T>
+  using PolymorphicWrapper = data::mapping::type::PolymorphicWrapper<T>;
+private:
+  
+  static void readInt8(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  static void readInt16(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  static void readInt32(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  static void readInt64(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  
+  static void readString(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  
+  static void readList(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  static void readObject(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  
+  static void readField(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  
+  static AbstractObjectWrapper readObject(const Type* const type, oatpp::parser::ParsingCaret& caret);
+  
+public:
+  
+  static AbstractObjectWrapper deserialize(oatpp::parser::ParsingCaret& caret, const Type* const type) {
+    if(type->name == oatpp::data::mapping::type::__class::AbstractObject::CLASS_NAME){
+      return readObject(type, caret);
+    }
+    return AbstractObjectWrapper::empty();
+  }
+  
+};
   
 }}}}
 

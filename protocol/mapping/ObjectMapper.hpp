@@ -25,7 +25,41 @@
 #ifndef oatpp_kafka_protocol_mapping_ObjectMapper_hpp
 #define oatpp_kafka_protocol_mapping_ObjectMapper_hpp
 
+#include "./Serializer.hpp"
+#include "./Deserializer.hpp"
+
+#include "oatpp/core/data/mapping/ObjectMapper.hpp"
+
 namespace oatpp { namespace kafka { namespace protocol { namespace mapping {
+  
+class ObjectMapper : public oatpp::base::Controllable, public oatpp::data::mapping::ObjectMapper {
+private:
+  static Info& getMapperInfo() {
+    static Info info("kafka-binary-protocol");
+    return info;
+  }
+public:
+  ObjectMapper()
+    : oatpp::data::mapping::ObjectMapper(getMapperInfo())
+  {}
+public:
+  
+  static std::shared_ptr<ObjectMapper> createShared(){
+    return std::shared_ptr<ObjectMapper>(new ObjectMapper());
+  }
+  
+  void write(const std::shared_ptr<oatpp::data::stream::OutputStream>& stream,
+             const oatpp::data::mapping::type::AbstractObjectWrapper& variant) const override {
+    Serializer::serialize(stream, variant);
+  }
+  
+  oatpp::data::mapping::type::AbstractObjectWrapper
+  read(oatpp::parser::ParsingCaret& caret,
+       const oatpp::data::mapping::type::Type* const type) const override {
+    return Deserializer::deserialize(caret, type);
+  }
+  
+};
   
 }}}}
 
