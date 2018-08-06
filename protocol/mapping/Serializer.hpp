@@ -57,9 +57,12 @@ private:
   static void writeInt64(oatpp::data::stream::OutputStream* stream, const PolymorphicWrapper<Int64::ObjectType>& value);
   
   static void writeString(oatpp::data::stream::OutputStream* stream, const PolymorphicWrapper<oatpp::base::StrBuffer>& value);
+  static void writeBytes(oatpp::data::stream::OutputStream* stream, const PolymorphicWrapper<oatpp::base::StrBuffer>& value);
   
   static void writeList(oatpp::data::stream::OutputStream* stream, const AbstractList::ObjectWrapper& list);
   static void writeObject(oatpp::data::stream::OutputStream* stream, const AbstractObjectWrapper& polymorph);
+  
+  static void writeMessageSet(oatpp::data::stream::OutputStream* stream, const AbstractObjectWrapper& polymorph);
   
   static void writeField(oatpp::data::stream::OutputStream* stream, const AbstractObjectWrapper& polymorph);
   

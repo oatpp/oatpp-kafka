@@ -24,6 +24,9 @@
 
 #include "Serializer.hpp"
 
+#include "oatpp-kafka/protocol/MessageSet.hpp"
+#include "./Types.hpp"
+
 #include <arpa/inet.h>
 
 namespace oatpp { namespace kafka { namespace protocol { namespace mapping {
@@ -72,6 +75,17 @@ void Serializer::writeString(oatpp::data::stream::OutputStream* stream, const Po
     stream->write(&size, 2);
   }
 }
+  
+void Serializer::writeBytes(oatpp::data::stream::OutputStream* stream, const PolymorphicWrapper<oatpp::base::StrBuffer>& value) {
+  if(value) {
+    v_int32 size = htonl(value->getSize());
+    stream->write(&size, 4);
+    stream->write(value->getData(), value->getSize());
+  } else {
+    v_int32 size = htonl(-1);
+    stream->write(&size, 4);
+  }
+}
 
 void Serializer::writeList(oatpp::data::stream::OutputStream* stream, const AbstractList::ObjectWrapper& list) {
   
@@ -101,6 +115,20 @@ void Serializer::writeObject(oatpp::data::stream::OutputStream* stream, const Ab
   }
 }
   
+void Serializer::writeMessageSet(oatpp::data::stream::OutputStream* stream, const AbstractObjectWrapper& polymorph) {
+  
+  auto messageSet = oatpp::data::mapping::type::static_wrapper_cast<MessageSet>(polymorph);
+  
+  auto messageSetStream = oatpp::data::stream::ChunkedBuffer::createShared();
+  messageSet->serialize(messageSetStream);
+  auto messageSetString = messageSetStream->toString();
+  
+  v_int32 messageSetSize = htonl(messageSetString->getSize());
+  stream->write(&messageSetSize, 4);
+  stream->write(messageSetString->getData(), messageSetString->getSize());
+  
+}
+  
 void Serializer::writeField(oatpp::data::stream::OutputStream* stream, const AbstractObjectWrapper& polymorph) {
   
   const Type* type = polymorph.valueType;
@@ -115,10 +143,14 @@ void Serializer::writeField(oatpp::data::stream::OutputStream* stream, const Abs
     writeInt64(stream, oatpp::data::mapping::type::static_wrapper_cast<Int64::ObjectType>(polymorph));
   } else if(type->name == oatpp::data::mapping::type::__class::String::CLASS_NAME) {
     writeString(stream, oatpp::data::mapping::type::static_wrapper_cast<oatpp::base::StrBuffer>(polymorph));
+  } else if(type->name == protocol::mapping::type::__class::Bytes::CLASS_NAME) {
+    writeBytes(stream, oatpp::data::mapping::type::static_wrapper_cast<oatpp::base::StrBuffer>(polymorph));
   } else if(type->name == oatpp::data::mapping::type::__class::AbstractList::CLASS_NAME) {
     writeList(stream, oatpp::data::mapping::type::static_wrapper_cast<AbstractList>(polymorph));
   } else if(type->name == oatpp::data::mapping::type::__class::AbstractObject::CLASS_NAME) {
     writeObject(stream, polymorph);
+  } else if(type->name == protocol::mapping::type::__class::MessageSet::CLASS_NAME) {
+    writeMessageSet(stream, polymorph);
   } else {
     throw std::runtime_error("[oatpp::kafka::protocol::mapping::Serializer::writeField]: Unknown data type");
   }

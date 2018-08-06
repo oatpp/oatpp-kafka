@@ -57,7 +57,11 @@ void Deserializer::readInt64(oatpp::parser::ParsingCaret& caret, AbstractObjectW
   if(caret.getPosition() + 8 > caret.getSize()) {
     throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readInt64]: Data corrupted. Can't read value");
   }
-  throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readInt64]: not implemented");
+  v_int64 w1 = ntohl(*((p_int32)caret.getCurrData()));
+  caret.inc(4);
+  v_int64 w2 = ntohl(*((p_int32)caret.getCurrData()));
+  caret.inc(4);
+  polymorph.setPtr(Int64::ObjectType::createAbstract((w1 << 32) | w2));
 }
 
 void Deserializer::readString(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {

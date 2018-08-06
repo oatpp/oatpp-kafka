@@ -22,47 +22,36 @@
  *
  ***************************************************************************/
 
-#include "MessageSet.hpp"
+#include "RecordBatch.hpp"
 
 #include "oatpp-kafka/protocol/mapping/Serializer.hpp"
 #include "oatpp-kafka/protocol/mapping/Deserializer.hpp"
 
-#include "oatpp/core/data/stream/ChunkedBuffer.hpp"
-#include "oatpp/algorithm/CRC.hpp"
-
 namespace oatpp { namespace kafka { namespace protocol {
   
-void MessageSet::serialize(const std::shared_ptr<oatpp::data::stream::OutputStream>& stream) {
+oatpp::data::mapping::type::AbstractObjectWrapper RecordBatch::deserialize(oatpp::parser::ParsingCaret& caret) {
   
-  auto messageStream = oatpp::data::stream::ChunkedBuffer::createShared();
+  auto header = oatpp::data::mapping::type::static_wrapper_cast<RecordBatchHeader>
+  (mapping::Deserializer::deserialize(caret, RecordBatchHeader::ObjectWrapper::Class::getType()));
   
-  auto curr = m_messages.getFirstNode();
+  auto records = Batch<Record::ObjectWrapper>::createShared();
   
-  while (curr != nullptr) {
-    
-    messageStream->clear();
-    mapping::Serializer::serialize(messageStream, curr->getData());
-    
-    auto message = messageStream->toString();
-    
-    p_word32 crc = (p_word32)&message->getData()[0]; // pointer to crc field
-    *crc = htonl(oatpp::algorithm::CRC32::calc(&message->getData()[4], message->getSize() - 4)); // calc crc of the message buffer
-    
-    v_word64 offset = htonl(0); // Hardcoded offset. TODO remove hardcode.
-    stream->write(&offset, 8);
-    
-    v_word32 messageSize = htonl(message->getSize());
-    stream->write(&messageSize, 4);
-    
-    stream->write(message->getData(), message->getSize());
-    
-    curr = curr->getNext();
+  for(v_int32 i = 0; i < header->length; i++) {
+    auto record = oatpp::data::mapping::type::static_wrapper_cast<Record>
+    (mapping::Deserializer::deserialize(caret, Record::ObjectWrapper::Class::getType()));
+    records->pushBack(record);
   }
   
-}
+  auto result = RecordBatch::createShared();
+  result->header = header;
+  result->records = records;
+  return oatpp::data::mapping::type::AbstractObjectWrapper(result.getPtr(), RecordBatch::ObjectWrapper::Class::getType());
   
-void MessageSet::addMessage(const MessageV0::ObjectWrapper& message) {
-  m_messages.pushBack(message);
+}
+
+void RecordBatch::serialize(const std::shared_ptr<oatpp::data::stream::OutputStream>& stream) {
+  mapping::Serializer::serialize(stream, header);
+  mapping::Serializer::serialize(stream, records);
 }
   
 }}}

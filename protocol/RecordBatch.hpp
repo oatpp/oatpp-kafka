@@ -22,8 +22,8 @@
  *
  ***************************************************************************/
 
-#ifndef oatpp_kafka_protocol_MessageSet_hpp
-#define oatpp_kafka_protocol_MessageSet_hpp
+#ifndef oatpp_kafka_protocol_RecordBatch_hpp
+#define oatpp_kafka_protocol_RecordBatch_hpp
 
 #include "oatpp-kafka/protocol/mapping/Types.hpp"
 
@@ -35,54 +35,72 @@
 
 namespace oatpp { namespace kafka { namespace protocol {
 #include OATPP_CODEGEN_BEGIN(DTO)
+  
+class Header : public oatpp::data::mapping::type::Object {
+  
+  DTO_INIT(Header, Object)
+  
+  DTO_FIELD(Data, headerKey);
+  DTO_FIELD(Data, headerValue);
+  
+};
 
-class MessageV0 : public oatpp::data::mapping::type::Object {
+class Record : public oatpp::data::mapping::type::Object {
   
-  DTO_INIT(MessageV0, Object)
+  DTO_INIT(Record, Object)
   
-  DTO_FIELD(Int32, crc);
-  DTO_FIELD(Int8, magicByte) = 0;
+  DTO_FIELD(VarInt, length);
   DTO_FIELD(Int8, attributes);
-  DTO_FIELD(Bytes, key);
-  DTO_FIELD(Bytes, value);
+  DTO_FIELD(VarInt, timestampDelta);
+  DTO_FIELD(VarInt, offsetDelta);
+  DTO_FIELD(Data, key);
+  DTO_FIELD(Data, value);
+  DTO_FIELD(List<Header::ObjectWrapper>::ObjectWrapper, headers);
   
 };
+
+class RecordBatchHeader : public oatpp::data::mapping::type::Object {
   
-class MessageV1 : public oatpp::data::mapping::type::Object {
+  DTO_INIT(RecordBatchHeader, Object)
   
-  DTO_INIT(MessageV1, Object)
-  
+  DTO_FIELD(Int64, firstOffset);
+  DTO_FIELD(Int32, length);
+  DTO_FIELD(Int32, partitionLeaderEpoch);
+  DTO_FIELD(Int8, magic);
   DTO_FIELD(Int32, crc);
-  DTO_FIELD(Int8, magicByte) = 1;
-  DTO_FIELD(Int8, attributes);
-  DTO_FIELD(Int64, timestamp);
-  DTO_FIELD(Bytes, key);
-  DTO_FIELD(Bytes, value);
+  DTO_FIELD(Int16, attributes);
+  
+  DTO_FIELD(Int32, lastOffsetDelta);
+  DTO_FIELD(Int64, firstTimestamp);
+  DTO_FIELD(Int64, maxTimestamp);
+  DTO_FIELD(Int64, producerId);
+  
+  DTO_FIELD(Int16, producerEpoch);
+  DTO_FIELD(Int32, firstSequence);
   
 };
-  
-class MessageSet : public oatpp::base::Controllable {
+
+class RecordBatch : public oatpp::base::Controllable {
 public:
-  typedef oatpp::data::mapping::type::ObjectWrapper<MessageSet, mapping::type::__class::MessageSet> ObjectWrapper;
+  typedef oatpp::data::mapping::type::ObjectWrapper<RecordBatch, mapping::type::__class::RecordBatch> ObjectWrapper;
 public:
-  OBJECT_POOL(MessageSet_POOL, MessageSet, 32)
-  SHARED_OBJECT_POOL(SHARED_MessageSet_POOL, MessageSet, 32)
-private:
-  oatpp::collection::LinkedList<MessageV0::ObjectWrapper> m_messages;
+  OBJECT_POOL(RecordBatch_POOL, RecordBatch, 32)
+  SHARED_OBJECT_POOL(SHARED_RecordBatch_POOL, RecordBatch, 32)
 public:
   
   static ObjectWrapper createShared(){
-    return ObjectWrapper(SHARED_MessageSet_POOL::allocateShared());
+    return ObjectWrapper(SHARED_RecordBatch_POOL::allocateShared());
   }
   
   static oatpp::data::mapping::type::AbstractObjectWrapper deserialize(oatpp::parser::ParsingCaret& caret);
   void serialize(const std::shared_ptr<oatpp::data::stream::OutputStream>& stream);
   
-  void addMessage(const MessageV0::ObjectWrapper& message);
+  RecordBatchHeader::ObjectWrapper header;
+  Batch<Record::ObjectWrapper>::ObjectWrapper records;
   
 };
   
 #include OATPP_CODEGEN_END(DTO)
 }}}
 
-#endif /* oatpp_kafka_protocol_MessageSet_hpp */
+#endif /* oatpp_kafka_protocol_RecordBatch_hpp */

@@ -45,12 +45,23 @@ namespace __class {
   template<class T>
   class Batch; // FWD
   
+  class MessageSet {
+  public:
+    constexpr static const char* const CLASS_NAME = "kafka::object::MessageSet";
+    
+    static Type* getType(){
+      static Type type(CLASS_NAME, nullptr);
+      return &type;
+    }
+    
+  };
+  
   class RecordBatch {
   public:
     constexpr static const char* const CLASS_NAME = "kafka::object::RecordBatch";
     
     static Type* getType(){
-      static Type type(CLASS_NAME);
+      static Type type(CLASS_NAME, nullptr);
       return &type;
     }
     
@@ -86,7 +97,7 @@ namespace __class {
     constexpr static const char* const CLASS_NAME = "kafka::Bytes";
     
     static Type* getType(){
-      static Type type(CLASS_NAME);
+      static Type type(CLASS_NAME, nullptr);
       return &type;
     }
     
@@ -97,7 +108,7 @@ namespace __class {
     constexpr static const char* const CLASS_NAME = "kafka::Data";
     
     static Type* getType(){
-      static Type type(CLASS_NAME);
+      static Type type(CLASS_NAME, nullptr);
       return &type;
     }
     
@@ -108,7 +119,7 @@ namespace __class {
     constexpr static const char* const CLASS_NAME = "kafka::VarInt";
     
     static Type* getType(){
-      static Type type(CLASS_NAME);
+      static Type type(CLASS_NAME, nullptr);
       return &type;
     }
     
