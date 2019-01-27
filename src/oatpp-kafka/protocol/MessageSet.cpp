@@ -30,6 +30,8 @@
 #include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 #include "oatpp/algorithm/CRC.hpp"
 
+#include "arpa/inet.h"
+
 namespace oatpp { namespace kafka { namespace protocol {
   
 void MessageSet::serialize(const std::shared_ptr<oatpp::data::stream::OutputStream>& stream) {
