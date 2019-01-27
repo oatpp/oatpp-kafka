@@ -24,6 +24,8 @@
 
 #include "Deserializer.hpp"
 
+#include <arpa/inet.h>
+
 namespace oatpp { namespace kafka { namespace protocol { namespace mapping {
   
 void Deserializer::readInt8(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
