@@ -27,7 +27,7 @@
 
 #include "oatpp-kafka/protocol/mapping/Types.hpp"
 
-#include "oatpp/core/parser/ParsingCaret.hpp"
+#include "oatpp/core/parser/Caret.hpp"
 #include "oatpp/core/data/stream/Stream.hpp"
 
 #include "oatpp/core/data/mapping/type/Object.hpp"
@@ -75,7 +75,7 @@ public:
     return ObjectWrapper(SHARED_MessageSet_POOL::allocateShared());
   }
   
-  static oatpp::data::mapping::type::AbstractObjectWrapper deserialize(oatpp::parser::ParsingCaret& caret);
+  static oatpp::data::mapping::type::AbstractObjectWrapper deserialize(oatpp::parser::Caret& caret);
   void serialize(const std::shared_ptr<oatpp::data::stream::OutputStream>& stream);
   
   void addMessage(const MessageV0::ObjectWrapper& message);

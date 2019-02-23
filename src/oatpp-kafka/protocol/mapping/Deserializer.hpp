@@ -30,7 +30,7 @@
 #include "oatpp/core/data/mapping/type/Primitive.hpp"
 #include "oatpp/core/data/mapping/type/Type.hpp"
 
-#include "oatpp/core/parser/ParsingCaret.hpp"
+#include "oatpp/core/parser/Caret.hpp"
 
 #include "oatpp/core/Types.hpp"
 
@@ -51,23 +51,23 @@ public:
   using PolymorphicWrapper = data::mapping::type::PolymorphicWrapper<T>;
 private:
   
-  static void readInt8(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
-  static void readInt16(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
-  static void readInt32(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
-  static void readInt64(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  static void readInt8(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph);
+  static void readInt16(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph);
+  static void readInt32(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph);
+  static void readInt64(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph);
   
-  static void readString(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  static void readString(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph);
   
-  static void readList(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
-  static void readObject(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  static void readList(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph);
+  static void readObject(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph);
   
-  static void readField(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph);
+  static void readField(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph);
   
-  static AbstractObjectWrapper readObject(const Type* const type, oatpp::parser::ParsingCaret& caret);
+  static AbstractObjectWrapper readObject(const Type* const type, oatpp::parser::Caret& caret);
   
 public:
   
-  static AbstractObjectWrapper deserialize(oatpp::parser::ParsingCaret& caret, const Type* const type) {
+  static AbstractObjectWrapper deserialize(oatpp::parser::Caret& caret, const Type* const type) {
     if(type->name == oatpp::data::mapping::type::__class::AbstractObject::CLASS_NAME){
       return readObject(type, caret);
     }

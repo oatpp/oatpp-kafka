@@ -29,9 +29,8 @@ public:
   Test() : oatpp::test::UnitTest("MyTag")
   {}
 
-  bool onRun() override {
-
-    return true;
+  void onRun() override {
+    // TODO write correct  tests
   }
 };
 

@@ -28,8 +28,8 @@
 
 namespace oatpp { namespace kafka { namespace protocol { namespace mapping {
   
-void Deserializer::readInt8(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
-  if(caret.getPosition() + 1 > caret.getSize()) {
+void Deserializer::readInt8(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph) {
+  if(caret.getPosition() + 1 > caret.getDataSize()) {
     throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readInt8]: Data corrupted. Can't read value");
   }
   v_int8 value = *((p_int8)caret.getCurrData());
@@ -37,8 +37,8 @@ void Deserializer::readInt8(oatpp::parser::ParsingCaret& caret, AbstractObjectWr
   polymorph.setPtr(Int8::ObjectType::createAbstract(value));
 }
 
-void Deserializer::readInt16(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
-  if(caret.getPosition() + 2 > caret.getSize()) {
+void Deserializer::readInt16(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph) {
+  if(caret.getPosition() + 2 > caret.getDataSize()) {
     throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readInt16]: Data corrupted. Can't read value");
   }
   v_int16 value = ntohs(*((p_int16)caret.getCurrData()));
@@ -46,8 +46,8 @@ void Deserializer::readInt16(oatpp::parser::ParsingCaret& caret, AbstractObjectW
   polymorph.setPtr(Int16::ObjectType::createAbstract(value));
 }
 
-void Deserializer::readInt32(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
-  if(caret.getPosition() + 4 > caret.getSize()) {
+void Deserializer::readInt32(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph) {
+  if(caret.getPosition() + 4 > caret.getDataSize()) {
     throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readInt32]: Data corrupted. Can't read value");
   }
   v_int32 value = ntohl(*((p_int32)caret.getCurrData()));
@@ -55,8 +55,8 @@ void Deserializer::readInt32(oatpp::parser::ParsingCaret& caret, AbstractObjectW
   polymorph.setPtr(Int32::ObjectType::createAbstract(value));
 }
 
-void Deserializer::readInt64(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
-  if(caret.getPosition() + 8 > caret.getSize()) {
+void Deserializer::readInt64(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph) {
+  if(caret.getPosition() + 8 > caret.getDataSize()) {
     throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readInt64]: Data corrupted. Can't read value");
   }
   v_int64 w1 = ntohl(*((p_int32)caret.getCurrData()));
@@ -66,14 +66,14 @@ void Deserializer::readInt64(oatpp::parser::ParsingCaret& caret, AbstractObjectW
   polymorph.setPtr(Int64::ObjectType::createAbstract((w1 << 32) | w2));
 }
 
-void Deserializer::readString(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
-  if(caret.getPosition() + 2 > caret.getSize()) {
+void Deserializer::readString(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph) {
+  if(caret.getPosition() + 2 > caret.getDataSize()) {
     throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readString]: Data corrupted. Can't read value");
   }
   v_int16 size = ntohs(*((p_int16)caret.getCurrData()));
   caret.inc(2);
   if(size > 0) {
-    if(caret.getPosition() + size > caret.getSize()) {
+    if(caret.getPosition() + size > caret.getDataSize()) {
       throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readString]: Data corrupted. Can't read value");
     }
     std::shared_ptr<oatpp::base::StrBuffer> str = oatpp::base::StrBuffer::createShared(caret.getCurrData(), size, true);
@@ -84,9 +84,9 @@ void Deserializer::readString(oatpp::parser::ParsingCaret& caret, AbstractObject
   }
 }
 
-void Deserializer::readList(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
+void Deserializer::readList(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph) {
   
-  if(caret.getPosition() + 3 >= caret.getSize()) {
+  if(caret.getPosition() + 3 >= caret.getDataSize()) {
     throw std::runtime_error("[oatpp::kafka::protocol::mapping::Deserializer::readList]: Data corrupted. Can't read value");
   }
   v_int32 size = ntohl(*((p_int32)caret.getCurrData()));
@@ -110,12 +110,12 @@ void Deserializer::readList(oatpp::parser::ParsingCaret& caret, AbstractObjectWr
   
 }
 
-void Deserializer::readObject(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
+void Deserializer::readObject(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph) {
   auto object = readObject(polymorph.valueType, caret);
   polymorph.setPtr(object.getPtr());
 }
   
-void Deserializer::readField(oatpp::parser::ParsingCaret& caret, AbstractObjectWrapper& polymorph) {
+void Deserializer::readField(oatpp::parser::Caret& caret, AbstractObjectWrapper& polymorph) {
   
   const Type* type = polymorph.valueType;
   
@@ -139,7 +139,7 @@ void Deserializer::readField(oatpp::parser::ParsingCaret& caret, AbstractObjectW
   
 }
   
-Deserializer::AbstractObjectWrapper Deserializer::readObject(const Type* const type, oatpp::parser::ParsingCaret& caret) {
+Deserializer::AbstractObjectWrapper Deserializer::readObject(const Type* const type, oatpp::parser::Caret& caret) {
   
   auto object = type->creator();
   

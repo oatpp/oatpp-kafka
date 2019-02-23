@@ -29,7 +29,7 @@
 
 namespace oatpp { namespace kafka { namespace protocol {
   
-oatpp::data::mapping::type::AbstractObjectWrapper RecordBatch::deserialize(oatpp::parser::ParsingCaret& caret) {
+oatpp::data::mapping::type::AbstractObjectWrapper RecordBatch::deserialize(oatpp::parser::Caret& caret) {
   
   auto header = oatpp::data::mapping::type::static_wrapper_cast<RecordBatchHeader>
   (mapping::Deserializer::deserialize(caret, RecordBatchHeader::ObjectWrapper::Class::getType()));
