@@ -80,7 +80,7 @@ class RecordBatchHeader : public oatpp::data::mapping::type::Object {
   
 };
 
-class RecordBatch : public oatpp::base::Controllable {
+class RecordBatch : public oatpp::base::Countable {
 public:
   typedef oatpp::data::mapping::type::ObjectWrapper<RecordBatch, mapping::type::__class::RecordBatch> ObjectWrapper;
 public:

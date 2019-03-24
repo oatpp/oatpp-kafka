@@ -61,7 +61,7 @@ class MessageV1 : public oatpp::data::mapping::type::Object {
   
 };
   
-class MessageSet : public oatpp::base::Controllable {
+class MessageSet : public oatpp::base::Countable {
 public:
   typedef oatpp::data::mapping::type::ObjectWrapper<MessageSet, mapping::type::__class::MessageSet> ObjectWrapper;
 public:

@@ -78,7 +78,7 @@ void Deserializer::readString(oatpp::parser::Caret& caret, AbstractObjectWrapper
     }
     std::shared_ptr<oatpp::base::StrBuffer> str = oatpp::base::StrBuffer::createShared(caret.getCurrData(), size, true);
     caret.inc(size);
-    polymorph.setPtr(std::static_pointer_cast<oatpp::base::Controllable>(str));
+    polymorph.setPtr(std::static_pointer_cast<oatpp::base::Countable>(str));
   } else {
     polymorph.setPtr(nullptr);
   }
